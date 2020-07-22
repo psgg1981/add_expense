@@ -55,7 +55,11 @@ def setup_menu_options(sh):
 	# e.g. get A6:A17
 	range_of_cells_contents = sh.sheet1.get(COL_OPTIONS+str(ROW_START_HOME)+':'+ COL_OPTIONS+str(ROW_TOTALS_HOME - 1))
 	# retrieve a single list of strings; ref. https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists/40857703
-	menu_options = functools.reduce(operator.iconcat, range_of_cells_contents, [])
+	global menu_options 
+	menu_options = flattenlist(range_of_cells_contents)
+
+def flattenlist(list):
+	return functools.reduce(operator.iconcat, list, [])
 
 # lists available menu options
 def list_menu_options():
@@ -86,9 +90,10 @@ sh = None
 
 # authenticates service account and initializes spreadsheet
 def auth_and_init():
+	global sh # required to be accessed elsewhere during read/write operations
 	print("Authenticating...")
 	gc = authenticate_gs()
-	print("Setting up menu options...")
+	print("Setting up menu options...")	
 	sh = initialize_gs(gc)
 	setup_menu_options(sh)
 
@@ -106,10 +111,14 @@ def validate_menu_option(option):
 def append_value_to_expenses(option, value):
 	# get month column to retrieve values from
 	month_col = get_curr_month()
+
+	# determine expense item and value to be affected
+	str_expense_item = str(sh.sheet1.get(COL_OPTIONS+str(option)))
+	str_expense_value = str(sh.sheet1.get(month_col+str(option)))
 	
-	print("Appending " + value + " to " +
-		  sh.sheet1.get(COL_OPTIONS+str(ROW_TOTALS_HOME)), 
-		  sh.sheet1.get(month_col+str(ROW_TOTALS_HOME)))
+	print("Appending " + value + 
+		  " to " + str_expense_item + 
+		  ", current value: " + str_expense_value)
 
 
 # main function: evaluates arguments
