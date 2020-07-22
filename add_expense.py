@@ -1,4 +1,4 @@
-"""ADD EXPENSE
+"""ADD EXPENSE appends currency amounts to your Google Spreadsheet.
 
 Usage:
 	add_expense [-h|--help]
@@ -13,6 +13,8 @@ Options:
 
 import gspread
 import datetime
+import functools
+import operator
 from docopt import docopt
 
 # Constants
@@ -50,13 +52,10 @@ menu_options = []
 
 # initializes available menu options
 def setup_menu_options(sh):
-	i=ROW_START_HOME
-	while (i<ROW_TOTALS_HOME):		
-		option_label = sh.sheet1.get(COL_OPTIONS+str(i))
-		if (option_label):
-			menu_options.append(option_label)
-		##print(int(i%ROW_TOTALS_HOME)+1, sh.sheet1.get(COL_OPTIONS+str(i)))
-		i = i + 1
+	# e.g. get A6:A17
+	range_of_cells_contents = sh.sheet1.get(COL_OPTIONS+str(ROW_START_HOME)+':'+ COL_OPTIONS+str(ROW_TOTALS_HOME - 1))
+	# retrieve a single list of strings; ref. https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists/40857703
+	menu_options = functools.reduce(operator.iconcat, range_of_cells_contents, [])
 
 # lists available menu options
 def list_menu_options():
@@ -98,7 +97,7 @@ def validate_menu_option(option):
 	if(not option.isnumeric()):
 		print("Option must be numeric")
 	if(int(option) > 0 and int(option) < len(menu_options)):
-		print("Selected option " + option + " found")
+		print("Selected option " + option + " found: " + str(menu_options[int(option)]))
 		return True
 	else:
 		print("Selected option " + option + " not found")
@@ -135,4 +134,4 @@ if __name__ == "__main__":
 			append_value_to_expenses(option, value)
 
 	else:
-		print(arguments)
+		print(__doc__)
