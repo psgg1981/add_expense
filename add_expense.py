@@ -4,17 +4,20 @@ Usage:
 	add_expense [-h|--help]
 	add_expense [-l|--list]
 	add_expense [-a|--add] <option> <value>
+	add_expense [-r|--read] <option>
 
 Options:
 	-h --help Show this screen
 	-l --list List options
 	-a --add Add new expense
+	-r --read Reads current monthly expenses amount and formula
 """
 
 import gspread
 import datetime
 import functools
 import operator
+import calendar
 from docopt import docopt
 
 # Constants
@@ -101,6 +104,7 @@ def auth_and_init():
 def validate_menu_option(option):
 	if(not option.isnumeric()):
 		print("Option must be numeric")
+		return False
 	if(int(option) > 0 and int(option) < len(menu_options)):
 		print("Selected option " + option + " found: " + str(menu_options[int(option)]))
 		return True
@@ -108,17 +112,66 @@ def validate_menu_option(option):
 		print("Selected option " + option + " not found")
 		return False
 
+# validates if a proper currency number
+def validate_value(value):
+	if(not value.isnumeric()):
+		print("Value must be numeric")
+		return False
+	if(float(value) <= 0):
+		print("Value must be positive")
+		return False
+	
+	return True
+
 def append_value_to_expenses(option, value):
 	# get month column to retrieve values from
 	month_col = get_curr_month()
 
-	# determine expense item and value to be affected
-	str_expense_item = str(sh.sheet1.get(COL_OPTIONS+str(option)))
-	str_expense_value = str(sh.sheet1.get(month_col+str(option)))
-	
-	print("Appending " + value + 
-		  " to " + str_expense_item + 
-		  ", current value: " + str_expense_value)
+	# find the row corresponding to the menu_option
+	option_row = sh.sheet1.find(menu_options[int(option)], in_column=1).row
+
+	if (option_row == None):
+		raise Exception("Unexpected error: row for menu option " + option + " not found!")
+	else:
+		# determine expense item and value to be affected
+		str_expense_item = sh.sheet1.get(COL_OPTIONS+str(option_row))[0][0]
+
+		# there may be no values yet saved...
+		try:
+			str_expense_value = str(sh.sheet1.get(month_col+str(option_row)))
+			print("Appending " + value + 
+				  " to " + str_expense_item + 
+				  ", current value: " + str_expense_value)
+
+		except KeyError:
+			print("Expenses item '" + str_expense_item + "' is currently empty (" + 
+				  calendar.month_name[int(datetime.datetime.now().month)] + " " + 
+				  str(datetime.datetime.now().year) + ")")
+			print("Setting " + str_expense_item + 
+				  " with " + value + "...")
+			sh.sheet1.update(month_col+str(option_row), value)
+		
+def read_expense_value(option):
+	# get month column to retrieve values from
+	month_col = get_curr_month()
+
+	# find the row corresponding to the menu_option
+	option_row = sh.sheet1.find(menu_options[int(option)], in_column=1).row
+
+	if (option_row == None):
+		raise Exception("Unexpected error: row for menu option " + option + " not found!")
+	else:
+		str_expense_item = sh.sheet1.get(COL_OPTIONS+str(option_row))[0][0]
+
+		# there may be no values yet saved...
+		try:
+			str_expense_value = sh.sheet1.get(month_col+str(option_row))[0][0]	
+			print(str_expense_item + " = " + str_expense_value)
+			return 0
+		except KeyError:
+			print("Expenses item '" + str_expense_item + "' is currently empty (" + 
+				  calendar.month_name[int(datetime.datetime.now().month)] + " " + 
+				  str(datetime.datetime.now().year) + ")")
 
 
 # main function: evaluates arguments
@@ -129,18 +182,25 @@ if __name__ == "__main__":
 	if arguments['-l'] or arguments['--list']:
 
 		auth_and_init()
-		print("Menu options:")
+		print("Menu option items:")
 		list_menu_options()
 
 	elif arguments['-a'] or arguments['--add']:
 		option = arguments['<option>']
 		value = arguments['<value>']
 
-		print('Adding ' + value + ' to ' + option + '...')
+		print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
+
+		auth_and_init()
+		if(validate_menu_option(option) and validate_value(value)):
+			append_value_to_expenses(option, round(value, 2))
+
+	elif arguments['-r'] or arguments['--read']:
+		option = arguments['<option>']
 
 		auth_and_init()
 		if(validate_menu_option(option)):
-			append_value_to_expenses(option, value)
+			read_expense_value(option)
 
 	else:
 		print(__doc__)
