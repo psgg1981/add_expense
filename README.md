@@ -80,7 +80,7 @@ Setting Electricity with $80.50...
 ![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1ckpU2WDfwiKi66Z1nbDYGMy10OIPs_ER "example of an updated expense entry in your google spreadsheet")
 > Note: updates are always done to the current date's month.
 
-To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` where 6 is the desired expense item
+To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` where 6 is the desired expense item (i.e. *Maintenance/repairs*)
 
 ```
 Authenticating...
@@ -88,5 +88,21 @@ Setting up menu options...
 Selected option 6 found: Maintenance/repairs
 Maintenance/repairs: 1 117,84 (=391,41+192,45+478,11+55,87)
 ```
+> Note: besides the total, the full formula is also shown.
 
 See more instructions by typing `add_expense.py --help`
+```
+ADD EXPENSE appends currency amounts to your Google Spreadsheet.
+
+Usage:
+        add_expense [-h|--help]
+        add_expense [-l|--list]
+        add_expense [-a|--add] <option> <value>
+        add_expense [-r|--read] <option>
+
+Options:
+        -h --help Show this screen
+        -l --list List options
+        -a --add Add new expense
+        -r --read Reads current monthly expenses amount and formula
+```
