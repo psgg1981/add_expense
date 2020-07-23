@@ -12,9 +12,14 @@ First you'll need a spreadsheet similar to [this one](https://docs.google.com/sp
 ![sample expenses in google spreadsheet](https://drive.google.com/uc?export=view&id=1kFs3Jsb_xqS8WqrFxBonAmjNta6aPBv- "Sample Expenses in Google Spreadsheet") 
 
 ## how to install it?
-1. [clone or download this project](https://drive.google.com/uc?export=view&id=1h_sGUhFhh7HSAjrTpwFpFFpuI5nOcMjq) 
+1. Clone or download this project
+
+![image showing clone and download actions in GitHub](https://drive.google.com/uc?export=view&id=1h_sGUhFhh7HSAjrTpwFpFFpuI5nOcMjq "GitHub's clone or download")
+
 2. Install [python3](https://www.python.org/downloads/)
-3. Setup Google API authentication to your spreadsheet as explained [in this section](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
+
+3. Setup Google API authentication to your spreadsheet as explained [in gspread's documentation](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
+
 4. Configure the month and expense item coordinates (see next section)
 
 ## how to configure it?
