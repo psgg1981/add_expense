@@ -18,6 +18,8 @@ First you'll need a spreadsheet similar to [this one](https://docs.google.com/sp
 
 ![sample expenses in google spreadsheet](https://drive.google.com/uc?export=view&id=1kFs3Jsb_xqS8WqrFxBonAmjNta6aPBv- "Sample Expenses in Google Spreadsheet") 
 
+<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
+
 ## how to install it?
 1. Clone or download this project
 
@@ -28,6 +30,8 @@ First you'll need a spreadsheet similar to [this one](https://docs.google.com/sp
 3. Setup Google API authentication to your spreadsheet as explained [in gspread's documentation](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
 
 4. Configure the month and expense item coordinates (see next section)
+
+<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
 
 ## how to configure it?
 For now, the spreadsheet cells of each expense item (1st column of the above spreadsheet sample) and each month (first row) need to be referenced in the code. Just edit the following few values, in respect to the location of each column and row:
@@ -52,6 +56,8 @@ COL_OCT		            = 'K'
 COL_NOV		            = 'L'
 COL_DEC		            = 'M'
 ```
+
+<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
 
 ## how to run it?
 
@@ -113,3 +119,5 @@ Options:
         -a --add Add new expense
         -r --read Reads current monthly expenses amount and formula
 ```
+
+<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
