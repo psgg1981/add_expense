@@ -139,7 +139,7 @@ def append_value_to_expenses(option, value):
 		# there may be no values yet saved...
 		try:
 			str_expense_value = str(sh.sheet1.get(month_col+str(option_row)))
-			print("Appending " + value + 
+			print("Appending " + str(value) + 
 				  " to " + str_expense_item + 
 				  ", current value: " + str_expense_value)
 
@@ -148,7 +148,7 @@ def append_value_to_expenses(option, value):
 				  calendar.month_name[int(datetime.datetime.now().month)] + " " + 
 				  str(datetime.datetime.now().year) + ")")
 			print("Setting " + str_expense_item + 
-				  " with " + value + "...")
+				  " with " + str(value) + "...")
 			sh.sheet1.update(month_col+str(option_row), value)
 		
 def read_expense_value(option):
@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
 		auth_and_init()
 		if(validate_menu_option(option) and validate_value(value)):
-			append_value_to_expenses(option, round(value, 2))
+			append_value_to_expenses(option, round(float(value), 2))
 
 	elif arguments['-r'] or arguments['--read']:
 		option = arguments['<option>']
