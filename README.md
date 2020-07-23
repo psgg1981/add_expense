@@ -3,6 +3,13 @@ Simple expenses tool tracking CLI, integrated with your well-defined Google Spre
 
 Makes use of gspread (https://gspread.readthedocs.io/en/latest/), a Python library for Google Sheets API.
 
+## table of contents
+* [why use it?](#why-use-it)
+* [how to use it?](#how-to-use-it)
+* [how to install it?](#how-to-install-it)
+* [how to configure it?](#how-to-configure-it)
+* [how to run it?](#how-to-run-it)
+
 ## why use it?
 This is just a fun program I wrote with Python to exercise a few concepts, but this may still come in handy when all you want is a straightforward approach to fast type and input your monthly expenses (i.e. no mouse pointing and clicking). Sure, it certainly requires improvements so be sure to check out the [Issues area](https://github.com/psgg1981/add_expense/issues).
 
