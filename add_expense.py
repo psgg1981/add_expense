@@ -114,14 +114,25 @@ def validate_menu_option(option):
 
 # validates if a proper currency number
 def validate_value(value):
-	if(not value.isnumeric()):
-		print("Value must be numeric")
+	if(not value.replace('.','',1).isdigit()):
+		print("Provided value " + str(value) + " must be a number" + ("", ". Please use '.' for input of decimal values.")[value.replace(',','',1).isdigit()])
 		return False
-	if(float(value) <= 0):
-		print("Value must be positive")
+	elif(float(value) <= 0):
+		print("Provided value " + str(value) + " must be positive")
+		return False
+	elif(round(float(value), 2) == 0):
+		print("Provided value " + str(value) + " is too low.")
 		return False
 	
 	return True
+
+# formats a string to a google spreadsheet number e.g. '2.5' -> '2,5'
+def format2gsnumber(string):
+	if(string.replace('.','',1).isdigit()):
+		string = string.replace(".", ",")
+		return string
+	else:
+		raise Exception(string + " is not a number")
 
 def append_value_to_expenses(option, value):
 	# get month column to retrieve values from
@@ -133,23 +144,47 @@ def append_value_to_expenses(option, value):
 	if (option_row == None):
 		raise Exception("Unexpected error: row for menu option " + option + " not found!")
 	else:
+		cell_position = month_col+str(option_row)
+
 		# determine expense item and value to be affected
 		str_expense_item = sh.sheet1.get(COL_OPTIONS+str(option_row))[0][0]
 
 		# there may be no values yet saved...
 		try:
-			str_expense_value = str(sh.sheet1.get(month_col+str(option_row)))
-			print("Appending " + str(value) + 
+			expense_value = sh.sheet1.get(cell_position)
+			# get the existing value's formula
+			expense_value_formula = sh.sheet1.acell(cell_position, value_render_option='FORMULA').value
+			##delete expense_value_formula = flattenlist(expense_value_formula)
+
+			print("Appending " + format2gsnumber(str(value)) + 
 				  " to " + str_expense_item + 
-				  ", current value: " + str_expense_value)
+				  ", current value: " + str(expense_value) + " " + str(expense_value_formula))
+
+			# check for formula types
+			# e.g. '=1+2' 	-> '=1+2+3'
+			if(expense_value_formula.find("=", 0, 1) > -1):		
+				expense_value_formula += "+" + format2gsnumber(str(value))
+			# e.g. '33' 	-> '=33+34'
+			elif(expense_value_formula.isdecimal() or expense_value_formula.isnumeric()):
+				expense_value_formula = "=" + expense_value_formula + "+" + format2gsnumber(str(value))
+			else:
+				raise Exception("Unable to determine proper formula update for cell " + cell_position + " in '" + str_expense_item + "' item")
+
+			# update the cell with the new formula
+			sh.sheet1.update_acell(cell_position, expense_value_formula)
+
+			# report the final value
+			final_expense_value = sh.sheet1.get(cell_position)[0][0]
+			print("Final value set to: " + str(final_expense_value))
+
 
 		except KeyError:
 			print("Expenses item '" + str_expense_item + "' is currently empty (" + 
 				  calendar.month_name[int(datetime.datetime.now().month)] + " " + 
 				  str(datetime.datetime.now().year) + ")")
 			print("Setting " + str_expense_item + 
-				  " with " + str(value) + "...")
-			sh.sheet1.update(month_col+str(option_row), value)
+				  " with " + format2gsnumber(str(value)) + "...")
+			sh.sheet1.update(cell_position, format2gsnumber(str(value)))
 		
 def read_expense_value(option):
 	# get month column to retrieve values from
@@ -161,12 +196,15 @@ def read_expense_value(option):
 	if (option_row == None):
 		raise Exception("Unexpected error: row for menu option " + option + " not found!")
 	else:
-		str_expense_item = sh.sheet1.get(COL_OPTIONS+str(option_row))[0][0]
+		cell_position = month_col+str(option_row)
 
+		str_expense_item = sh.sheet1.get(COL_OPTIONS+str(option_row))[0][0]
+		
 		# there may be no values yet saved...
 		try:
-			str_expense_value = sh.sheet1.get(month_col+str(option_row))[0][0]	
-			print(str_expense_item + " = " + str_expense_value)
+			str_expense_value = sh.sheet1.get(cell_position)[0][0]	
+			str_expense_value_formula = sh.sheet1.acell(cell_position, value_render_option='FORMULA').value
+			print(str_expense_item + ": " + str_expense_value + " (" + str_expense_value_formula + ")")
 			return 0
 		except KeyError:
 			print("Expenses item '" + str_expense_item + "' is currently empty (" + 
@@ -189,10 +227,9 @@ if __name__ == "__main__":
 		option = arguments['<option>']
 		value = arguments['<value>']
 
-		print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
-
 		auth_and_init()
 		if(validate_menu_option(option) and validate_value(value)):
+			print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
 			append_value_to_expenses(option, round(float(value), 2))
 
 	elif arguments['-r'] or arguments['--read']:
