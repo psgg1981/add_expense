@@ -64,7 +64,7 @@ Menu option items:
 8 Other
 ```
 
-To add a new expense say, to your electricity bill, type e.g. `add_expense.py -a 2 80.50` or `add_expense.py --add 2 80.50`
+To add a new expense, e.g. to your electricity bill, type `add_expense.py -a 2 80.50` or `add_expense.py --add 2 80.50`
 
 and the result will be something similar to this:
 
@@ -80,7 +80,7 @@ Setting Electricity with $80.50...
 ![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1ckpU2WDfwiKi66Z1nbDYGMy10OIPs_ER "example of an updated expense entry in your google spreadsheet")
 > Note: updates are always done to the current date's month.
 
-To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` where 6 is the desired expense item (i.e. *Maintenance/repairs*)
+To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` (i.e. *Maintenance/repairs* for this example)
 
 ```
 Authenticating...
