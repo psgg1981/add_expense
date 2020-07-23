@@ -23,11 +23,8 @@ from docopt import docopt
 # Constants
 COL_OPTIONS = 'A'
 
-ROW_START_HOME 	 	 =  6
-ROW_TOTALS_HOME 	 = 18
-ROW_TOTALS_TRANSPORT = 31
-ROW_TOTALS_KIDS 	 = 45
-ROW_TOTALS_EDUCATION = 54
+EXPENSES_ROW_START 	 	 =  6
+EXPENSES_ROW_TOTALS 	 = 18
 
 
 COL_JAN		= 'B'
@@ -56,7 +53,7 @@ menu_options = []
 # initializes available menu options
 def setup_menu_options(sh):
 	# e.g. get A6:A17
-	range_of_cells_contents = sh.sheet1.get(COL_OPTIONS+str(ROW_START_HOME)+':'+ COL_OPTIONS+str(ROW_TOTALS_HOME - 1))
+	range_of_cells_contents = sh.sheet1.get(COL_OPTIONS+str(EXPENSES_ROW_START)+':'+ COL_OPTIONS+str(EXPENSES_ROW_TOTALS - 1))
 	# retrieve a single list of strings; ref. https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists/40857703
 	global menu_options 
 	menu_options = flattenlist(range_of_cells_contents)
