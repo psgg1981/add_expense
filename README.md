@@ -68,9 +68,10 @@ Selected option 2 found: Electricity
 Expenses item 'Electricity' is currently empty (July 2020)
 Setting Electricity with $80.50...
 ```
-> Note: as of the time of this writing there is still too much verbosity in the app, which will be corrected in the future.
+> Note: as of the time of this writing there is still too much verbosity in user's feedback. This will be corrected in the near future.
 
-![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1zo3Hn3XOlg-Tzx7wWBAEFyKn7o-ycZ3L "example of an updated expense entry in your google spreadsheet")
+![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1ckpU2WDfwiKi66Z1nbDYGMy10OIPs_ER "example of an updated expense entry in your google spreadsheet")
+> Note: updates are always done to the current date's month.
 
 To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` where 6 is the desired expense item
 
