@@ -1,7 +1,7 @@
 # add_expense
-Simple expenses tool tracking CLI, integrated with your well-defined Google Spreadsheet. 
+Simple expenses tool tracking CLI integrated with your own Google Spreadsheet.
 
-Makes use of gspread (https://gspread.readthedocs.io/en/latest/), a Python library for Google Sheets API.
+Makes use of [gspread](https://gspread.readthedocs.io/en/latest/), a Python library for Google Sheets API.
 
 ## table of contents
 * [why use it?](#why-use-it)
@@ -11,14 +11,14 @@ Makes use of gspread (https://gspread.readthedocs.io/en/latest/), a Python libra
 * [how to run it?](#how-to-run-it)
 
 ## why use it?
-This is just a fun program I wrote with Python to exercise a few concepts, but this may still come in handy when all you want is a straightforward approach to fast type and input your monthly expenses (i.e. no mouse pointing and clicking). Sure, it certainly requires improvements so be sure to check out the [Issues area](https://github.com/psgg1981/add_expense/issues).
+This is just a fun program I wrote with Python to exercise a few concepts, but this may still come in handy when all you want is a straightforward approach to fast type and input your monthly expenses (i.e. no mouse pointing and clicking). Sure, it certainly requires improvements so be sure to check out the [issues area](https://github.com/psgg1981/add_expense/issues).
 
 ## how to use it?
 First you'll need a spreadsheet similar to [this one](https://docs.google.com/spreadsheets/d/e/2PACX-1vScal8ROjGMx-SyWfGmpc7aAztn-ACMYNFlmx8mZX4DEm4ijTP69DGWcqHlwKvim70LKJI90YbuFAHQ/pubhtml).
 
 ![sample expenses in google spreadsheet](https://drive.google.com/uc?export=view&id=1kFs3Jsb_xqS8WqrFxBonAmjNta6aPBv- "Sample Expenses in Google Spreadsheet") 
 
-<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
+<div style="text-align: right"> <a href="#add_expense">:point_up: go to top</a> </div>
 
 ## how to install it?
 1. Clone or download this project
@@ -31,7 +31,7 @@ First you'll need a spreadsheet similar to [this one](https://docs.google.com/sp
 
 4. Configure the month and expense item coordinates (see next section)
 
-<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
+<div style="text-align: right"> <a href="#add_expense">:point_up: go to top</a> </div>
 
 ## how to configure it?
 For now, the spreadsheet cells of each expense item (1st column of the above spreadsheet sample) and each month (first row) need to be referenced in the code. Just edit the following few values, in respect to the location of each column and row:
@@ -57,7 +57,7 @@ COL_NOV		            = 'L'
 COL_DEC		            = 'M'
 ```
 
-<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
+<div style="text-align: right"> <a href="#add_expense">:point_up: go to top</a> </div>
 
 ## how to run it?
 
@@ -120,4 +120,4 @@ Options:
         -r --read Reads current monthly expenses amount and formula
 ```
 
-<div style="text-align: right"> <a href="#add_expense">go to top</a> </div>
+<div style="text-align: right"> <a href="#add_expense">:point_up: go to top</a> </div>
