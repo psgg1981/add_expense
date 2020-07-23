@@ -1,6 +1,7 @@
 # add_expense
 Simple expenses tool tracking CLI, integrated with a well-defined Google Spreadsheet
-Makes use of gspread (https://gspread.readthedocs.io/en/latest/), a Python API for Google Sheets.
+
+Makes use of gspread (https://gspread.readthedocs.io/en/latest/), a Python library for Google Sheets API.
 
 ## how to use it?
 First you'll need a spreadsheet similar to [this one](https://docs.google.com/spreadsheets/d/e/2PACX-1vScal8ROjGMx-SyWfGmpc7aAztn-ACMYNFlmx8mZX4DEm4ijTP69DGWcqHlwKvim70LKJI90YbuFAHQ/pubhtml).
@@ -37,10 +38,38 @@ COL_DEC		            = 'M'
 
 ## how to run it?
 
-To list the current expense items in your spreadsheet type `add_expense.py --list` or `add_expense.py -l`
+To list the current expense items in your spreadsheet type `add_expense.py --list` or `add_expense.py -l`. This should present something like the below:
+```
+Authenticating...
+Setting up menu options...
+Menu option items:
+0 Mortage-rent
+1 Phone
+2 Electricity
+3 Gas
+4 Water
+5 Cable
+6 Maintenance-repairs
+7 Supplies
+8 Other
+```
 
-To add a new expense in your spreadsheet type `add_expense.py -a 1 2` or `add_expense.py --add 1 2`
+To add a new expense say, to your electricity bill, type e.g. `add_expense.py -a 2 80.50` or `add_expense.py --add 2 80.50`
 
-To read the current expenses from your spreadsheet type `add_expense.py -r 1` or `add_expense.py --read 1` where 1 is the options listed in the first command above
+and the result will be something similar to this:
 
-See more instructions typing `add_expense.py --help`
+```
+Authenticating...
+Setting up menu options...
+Selected option 2 found: Electricity
+Adding $80.50 to item 2...
+Expenses item 'Electricity' is currently empty (July 2020)
+Setting Electricity with 80,5...
+```
+> Note: as of the time of this writing there is still too much verbosity in the app, which will be corrected in the future.
+
+![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1zo3Hn3XOlg-Tzx7wWBAEFyKn7o-ycZ3L "example of an updated expense entry in your google spreadsheet")
+
+To read the current expenses from your spreadsheet type `add_expense.py -r 2` or `add_expense.py --read 2`
+
+See more instructions by typing `add_expense.py --help`
