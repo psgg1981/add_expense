@@ -1,10 +1,16 @@
 from behave import given, when, then
+from hamcrest import assert_that, has_item
 import subprocess
+import os
+
+# ##################################################
+# Feature: simple command line documentation usage
+# ##################################################
 
 # Scenario: run without any parameters
 @given(u'we have add_expense installed')
 def step_impl(context):
-	pass
+	assert_that(os.listdir(), has_item('add_expense.py'))
 
 @when(u'we call add_expense without any parameters')
 def step_impl(context):
@@ -23,9 +29,9 @@ def step_impl(context):
 
 
 # Scenario: run without any help parameter
-@given(u'we have add_expense installed and will be testing the help shorthand parameter')
+@given(u'we have add_expense installed for testing with help shorthand parameter')
 def step_impl(context):
-	pass
+	context.execute_steps(u'Given we have add_expense installed')
 
 @when(u'we call add_expense with help parameter "{parameter}"')
 def step_impl(context, parameter):
@@ -48,9 +54,9 @@ def step_impl(context, keyword):
 
 
 # Scenario: run with help parameter --help
-@given(u'we have add_expense installed and will be testing the help full spec parameter')
+@given(u'we have add_expense installed for testing with the help full spec parameter')
 def step_impl(context):
-	pass
+	context.execute_steps(u'Given we have add_expense installed')
 
 @when(u'we call add_expense with help full label parameter "{parameter}"')
 def step_impl(context, parameter):
