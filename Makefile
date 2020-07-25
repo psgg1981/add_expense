@@ -11,6 +11,8 @@ PY=python -m py_compile
 test:
     behave --stop
     # use this instead to capture all debug entries: behave --stop --no-logcapture --logging-level DEBUG
+lint:
+    pylint add_expense.py
 install:
     pip install -r requirements.txt
 compile:

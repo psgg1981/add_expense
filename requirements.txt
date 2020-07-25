@@ -2,3 +2,4 @@ gspread
 docopt
 behave
 pyhamcrest
+pylintrc
