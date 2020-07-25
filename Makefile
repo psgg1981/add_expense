@@ -9,7 +9,7 @@ PY=python -m py_compile
 #    @make test
 #    @make install
 test:
-    behave
+    behave --stop
 install:
     pip install -r requirements.txt
 compile:
