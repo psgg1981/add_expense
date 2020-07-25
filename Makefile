@@ -10,6 +10,7 @@ PY=python -m py_compile
 #    @make install
 test:
     behave --stop
+    # use this instead to capture all debug entries: behave --stop --no-logcapture --logging-level DEBUG
 install:
     pip install -r requirements.txt
 compile:
