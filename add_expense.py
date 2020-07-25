@@ -40,9 +40,19 @@ COL_OCT		= 'K'
 COL_NOV		= 'L'
 COL_DEC		= 'M'
 
+# exceptions
+class AuthenticationFailedException(Exception):
+     def __init__(self, value):
+         self.value = value
+     def __str__(self):
+         return repr(self.value)
+
 # authenticates service account on google spreadsheets
 def authenticate_gs():
-	return gspread.service_account()
+	try:
+		return gspread.service_account()
+	except:
+		raise AuthenticationFailedException("Google API Service Account key not found. Please follow instructions at https://gspread.readthedocs.io/en/latest/oauth2.html")
 
 # opens google spreadsheet
 def initialize_gs(gc):
@@ -212,29 +222,35 @@ def read_expense_value(option):
 # main function: evaluates arguments
 if __name__ == "__main__":
 
-	arguments = docopt(__doc__, version='DEMO 1.0')
-	
-	if arguments['-l'] or arguments['--list']:
+	try:
+		arguments = docopt(__doc__, version='DEMO 1.0')
+		
+		if arguments['-l'] or arguments['--list']:
 
-		auth_and_init()
-		print("Menu option items:")
-		list_menu_options()
+			auth_and_init()
+			print("Menu option items:")
+			list_menu_options()
 
-	elif arguments['-a'] or arguments['--add']:
-		option = arguments['<option>']
-		value = arguments['<value>']
+		elif arguments['-a'] or arguments['--add']:
+			option = arguments['<option>']
+			value = arguments['<value>']
 
-		auth_and_init()
-		if(validate_menu_option(option) and validate_value(value)):
-			print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
-			append_value_to_expenses(option, round(float(value), 2))
+			auth_and_init()
+			if(validate_menu_option(option) and validate_value(value)):
+				print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
+				append_value_to_expenses(option, round(float(value), 2))
 
-	elif arguments['-r'] or arguments['--read']:
-		option = arguments['<option>']
+		elif arguments['-r'] or arguments['--read']:
+			option = arguments['<option>']
 
-		auth_and_init()
-		if(validate_menu_option(option)):
-			read_expense_value(option)
+			auth_and_init()
+			if(validate_menu_option(option)):
+				read_expense_value(option)
 
-	else:
-		print(__doc__)
+		else:
+			print(__doc__)
+
+	except AuthenticationFailedException as e: 
+		print("Error: " + str(e).strip('\''))
+	except Exception as e:
+		print("Unkown error occurred.")
