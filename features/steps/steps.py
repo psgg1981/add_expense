@@ -2,6 +2,7 @@ from behave import given, when, then
 from hamcrest import assert_that, has_item
 import subprocess
 import os, logging
+from add_expense import AddExpenses
 
 # ##################################################
 # Feature: simple command line documentation usage
@@ -69,3 +70,45 @@ def step_impl(context, parameter):
 def step_impl(context, keyword):	
 	logging.debug('keyword: ' + keyword)
 	context.execute_steps(u'Then add_expense should output the instructions keyword "{0}"'.format(keyword))
+
+
+
+# ##################################################
+# Feature: simple command line read-only usage
+# ##################################################
+
+TEST_SPREADSHEET_ID = '2PACX-1vScal8ROjGMx-SyWfGmpc7aAztn-ACMYNFlmx8mZX4DEm4ijTP69DGWcqHlwKvim70LKJI90YbuFAHQ'
+
+# Scenario: run to list options
+@given(u'that we have a sample spreadsheet')
+def step_impl(context):
+	try:
+#		addexpenses = AddExpenses()
+
+#		gc = addexpenses.authenticate_gs()
+
+#		gc.client.open(TEST_SPREADSHEET_ID)
+	except Exception as exception: 
+		logging.exception(str(exception).strip('\''))
+		assert False, "Error occurred"
+
+	raise NotImplementedError(u'STEP: Given that we have a sample spreadsheet')
+
+@when(u'we call add_expense with list parameter "{parameter}"')
+def step_impl(context, parameter):
+    raise NotImplementedError(u'STEP: When we call add_expense with list parameter "-l"')
+
+@then(u'add_expense should output the list of options available on the sample spreadsheet')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then add_expense should output the list of options available on the sample spreadsheet')
+
+# Scenario: run to list options
+@given(u'that we have a sample spreadsheet, too')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Given that we have a sample spreadsheet, too')
+
+## see above @when(u'we call add_expense with list parameter "-list"')
+
+@then(u'add_expense should output the list of options available on the sample spreadsheet, too')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then add_expense should output the list of options available on the sample spreadsheet, too')
