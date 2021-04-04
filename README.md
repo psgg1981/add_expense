@@ -91,10 +91,10 @@ Setting Electricity with $80.50...
 > Note: as of the time of this writing there is still too much verbosity in user's feedback. This will hopefully be corrected in the near future.
 
 ![example of an updated expense entry in your google spreadsheet](https://drive.google.com/uc?export=view&id=1ckpU2WDfwiKi66Z1nbDYGMy10OIPs_ER "example of an updated expense entry in your google spreadsheet")
-> Note: updates are always done to the current date's month unless month abbreviation e.g. Jan, Feb, etc. is specified.
+> Note: updates are always done to the current date's month unless month abbreviation (e.g. Jan, Feb, etc.) is specified.
 
 To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` (i.e. *Maintenance/repairs* for this example)
-> Note: updates are always done to the current date's month unless month abbreviation e.g. Jan, Feb, etc. is specified.
+> Note: read operations are always done to the current date's month unless month abbreviation (e.g. Jan, Feb, etc.) is specified.
 
 ```
 Authenticating...
