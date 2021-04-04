@@ -4,13 +4,13 @@ Usage:
 	add_expense [-h|--help]
 	add_expense [-l|--list]
 	add_expense [-a|--add] (<option> <value>) [<month>]
-	add_expense [-r|--read] <option>
+	add_expense [-r|--read] <option> [<month>]
 
 Options:
 	-h --help  Show this screen
 	-l --list  List options
-	-a --add   Add new expense (to current month, by default else use month 3-letter name e.g. Jan Feb Mar etc.)
-	-r --read  Reads current monthly expenses amount and formula
+	-a --add   Add new expense (to current month, by default, else use month 3-letter name e.g. Jan Feb Mar etc.)
+	-r --read  Reads expenses amount and formula (of current month, by default, else use month 3-letter name e.g. Jan Feb Mar etc.)
 """
 
 from docopt import docopt
@@ -54,8 +54,15 @@ if __name__ == "__main__":
 		elif arguments['-r'] or arguments['--read']:
 
 			option = arguments['<option>']
+			month = arguments['<month>']
 
-			addexpenses.readOption(option)
+			# if no month option entered then default to current
+			if month == None:
+
+				month = int(datetime.datetime.now().month)		# find the month number from today's date
+				month = calendar.month_abbr[month]				# find the month abbreviation e.g. Jan from the month number
+
+			addexpenses.readOption(option, month)
 
 		else:
 			print(__doc__)

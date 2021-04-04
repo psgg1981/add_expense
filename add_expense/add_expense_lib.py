@@ -55,10 +55,11 @@ class AddExpenses:
 		print("Menu option items:")
 		self.list_menu_options()
 
-	def	readOption(self, option):
+	def	readOption(self, option, month):
 		self.auth_and_init()
-		if self.validate_menu_option(option):
-			self.read_expense_value(option)
+		if self.validate_menu_option(option) and self.validate_month(month):
+			self.read_expense_value(option, 
+									self.get_month_col(month))	# get month column to retrieve values from
 
 	# returns current month constant
 	def get_curr_month(self):
@@ -121,7 +122,7 @@ class AddExpenses:
 		if(self.validate_menu_option(option) and self.validate_value(value) and self.validate_month(month)):			
 			self.append_value_to_expenses(	option, 
 											round(float(value), 2),
-											self.get_month_col(month))
+											self.get_month_col(month))	# get month column to retrieve values from
 
 
 	# authenticates service account on google spreadsheets
@@ -189,10 +190,9 @@ class AddExpenses:
 
 	# validates if a proper currency number
 	def validate_month(self, month):
-
-		if list(calendar.month_abbr).index(month) < 0:
-
-			raise InvalidMonthAbbreviation('Invalid month ' + month +'. Expecting value from ' + ','.join(list(calendar.month_abbr)))
+		if month not in list(calendar.month_abbr):
+			print('Invalid month ' + month +'. Expecting value from ' + ','.join(list(calendar.month_abbr))[1:])
+			return False
 
 		return True
 
@@ -266,9 +266,7 @@ class AddExpenses:
 		else:
 			raise UnexpectedFlow("Unexpected error: row for menu option " + option + " not found!")
 			
-	def read_expense_value(self, option):
-		# get month column to retrieve values from
-		month_col = self.get_curr_month()
+	def read_expense_value(self, option, month_col):		
 
 		sheet = self.spreadsheet.sheet1
 
