@@ -1,24 +1,9 @@
-"""ADD EXPENSE appends currency amounts to your Google Spreadsheet.
-
-Usage:
-	add_expense [-h|--help]
-	add_expense [-l|--list]
-	add_expense [-a|--add] <option> <value>
-	add_expense [-r|--read] <option>
-
-Options:
-	-h --help Show this screen
-	-l --list List options
-	-a --add Add new expense
-	-r --read Reads current monthly expenses amount and formula
-"""
-
-import gspread
 import datetime
 import functools
 import operator
 import calendar
-from docopt import docopt
+
+import gspread
 
 # Constants
 COL_OPTIONS = 'A'
@@ -75,11 +60,68 @@ class AddExpenses:
 		if self.validate_menu_option(option):
 			self.read_expense_value(option)
 
-	def submit(self, option, value):
+	# returns current month constant
+	def get_curr_month(self):
+		switcher = {
+			1:	COL_JAN,
+			2:	COL_FEB,
+			3:	COL_MAR,
+			4:	COL_APR,
+			5:	COL_MAY,
+			6:	COL_JUN,
+			7:	COL_JUL,
+			8:	COL_AUG,
+			9:	COL_SEP,
+			10:	COL_OCT,
+			11:	COL_NOV,
+			12:	COL_DEC
+		}
+		month = int(datetime.datetime.now().month)
+		return switcher.get(month)
+
+	# returns configured column for given month
+	def get_month_col(self, month):
+		switcher = {
+			'Jan':	COL_JAN,
+			'Feb':	COL_FEB,
+			'Mar':	COL_MAR,
+			'Apr':	COL_APR,
+			'May':	COL_MAY,
+			'Jun':	COL_JUN,
+			'Jul':	COL_JUL,
+			'Aug':	COL_AUG,
+			'Sep':	COL_SEP,
+			'Oct':	COL_OCT,
+			'Nov':	COL_NOV,
+			'Dec':	COL_DEC
+		}
+		return switcher.get(month)
+
+	# returns month name from configured spreadsheet cell column
+	def get_month_name_by_col(self, month_col):
+		switcher = {
+			COL_JAN: 'Jan',
+			COL_FEB: 'Feb',
+			COL_MAR: 'Mar',
+			COL_APR: 'Apr',
+			COL_MAY: 'May',
+			COL_JUN: 'Jun',
+			COL_JUL: 'Jul',
+			COL_AUG: 'Aug',
+			COL_SEP: 'Sep',
+			COL_OCT: 'Oct',
+			COL_NOV: 'Nov',
+			COL_DEC: 'Dec'
+		}
+		return switcher.get(month_col)
+
+	# adds new currency value under given month (e.g. Jan, Feb, etc.) to specified option
+	def submit(self, option, value, month):
 		self.auth_and_init()
-		if(self.validate_menu_option(option) and self.validate_value(value)):
-			print('Adding ' + '${:,.2f}'.format(float(value)) + ' to item' + option + '...')
-			self.append_value_to_expenses(option, round(float(value), 2))
+		if(self.validate_menu_option(option) and self.validate_value(value) and self.validate_month(month)):			
+			self.append_value_to_expenses(	option, 
+											round(float(value), 2),
+											self.get_month_col(month))
 
 
 	# authenticates service account on google spreadsheets
@@ -110,25 +152,6 @@ class AddExpenses:
 	def list_menu_options(self):
 		for idx, val in enumerate(self.menu_options):
 			print(idx, val)
-
-	# returns current month constant
-	def get_curr_month(self):
-		switcher = {
-			1:	COL_JAN,
-			2:	COL_FEB,
-			3:	COL_MAR,
-			4:	COL_APR,
-			5:	COL_MAY,
-			6:	COL_JUN,
-			7:	COL_JUL,
-			8:	COL_AUG,
-			9:	COL_SEP,
-			10:	COL_OCT,
-			11:	COL_NOV,
-			12:	COL_DEC
-		}
-		month = int(datetime.datetime.now().month)
-		return switcher.get(month)
 
 	# authenticates service account and initializes spreadsheet
 	def auth_and_init(self):
@@ -164,17 +187,29 @@ class AddExpenses:
 		
 		return True
 
-	# formats a string to a google spreadsheet number format e.g. '2.5' -> '2,5'
+	# validates if a proper currency number
+	def validate_month(self, month):
+
+		if list(calendar.month_abbr).index(month) < 0:
+
+			raise InvalidMonthAbbreviation('Invalid month ' + month +'. Expecting value from ' + ','.join(list(calendar.month_abbr)))
+
+		return True
+
+	# formats a string to a google spreadsheet number format e.g. '2.5' -> '2,50'
 	def format2gsnumber(self, string):
 		if string.replace('.','',1).isdigit():
+
+			# adding trailing zeros to string, https://www.kite.com/python/answers/how-to-print-a-float-with-two-decimal-places-in-python
+			string = "{:.2f}".format(float(string))
+
 			string = string.replace(".", ",")
+
 			return string
 		else:
 			raise UnexpectedFormat(string + " is not a number")
 
-	def append_value_to_expenses(self, option, value):
-		# get month column to retrieve values from
-		month_col = self.get_curr_month()
+	def append_value_to_expenses(self, option, value, month_col):
 
 		sheet = self.spreadsheet.sheet1
 
@@ -198,6 +233,7 @@ class AddExpenses:
 
 				print("Appending $" + self.format2gsnumber(str(value)) + 
 					  " to " + str_expense_item + 
+					  " under " + self.get_month_name_by_col(month_col) +
 					  ", current value: " + str(expense_value) + " " + str(expense_value_formula))
 
 				# check for formula types
@@ -256,36 +292,3 @@ class AddExpenses:
 					  str(datetime.datetime.now().year) + ")")
 		else:
 			raise UnexpectedFlow("Unexpected error: row for menu option " + option + " not found!")
-
-
-# main function: evaluates arguments
-if __name__ == "__main__":
-
-	addexpenses = AddExpenses()
-
-	try:
-		arguments = docopt(__doc__, version='DEMO 1.0')
-		
-		if arguments['-l'] or arguments['--list']:
-
-			addexpenses.listOptions()
-
-		elif arguments['-a'] or arguments['--add']:
-			option = arguments['<option>']
-			value = arguments['<value>']
-
-			addexpenses.submit(option, value)
-
-		elif arguments['-r'] or arguments['--read']:
-
-			option = arguments['<option>']
-
-			addexpenses.readOption(option)
-
-		else:
-			print(__doc__)
-
-	except AuthenticationFailedException as exception: 
-		print("Error: " + str(exception).strip('\''))
-	except Exception as exception:
-		print("Unknown error occurred.")
