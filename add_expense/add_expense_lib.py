@@ -2,15 +2,18 @@ import datetime
 import functools
 import operator
 import calendar
+import re
 
 import gspread
 
 # Constants
-COL_OPTIONS = 'A'
+COL_OPTIONS = 'A'							# column with expense items to list
 
-EXPENSES_ROW_START 	 	 =  6
-EXPENSES_ROW_TOTALS 	 = 18
+GROUP_A_EXPENSES_ROW_START 	 	 =  6		# start of row with items from group A expenses
+GROUP_A_EXPENSES_ROW_TOTALS 	 = 18		# end of row with items from group A expenses
 
+#GROUP_B_EXPENSES_ROW_START 	 = 21		# start of row with items from group B expenses
+#GROUP_B_EXPENSES_ROW_TOTALS 	 = 30		# end of row with items from group B expenses
 
 COL_JAN		= 'B'
 COL_FEB		= 'C'
@@ -120,8 +123,13 @@ class AddExpenses:
 	def submit(self, option, value, month):
 		self.auth_and_init()
 		if(self.validate_menu_option(option) and self.validate_value(value) and self.validate_month(month)):			
+
+			# if value is a single value then round it to 2 decimal places
+			if(value.replace('.','',1).isdigit()):
+				value = round(float(value), 2)
+
 			self.append_value_to_expenses(	option, 
-											round(float(value), 2),
+											value,
 											self.get_month_col(month))	# get month column to retrieve values from
 
 
@@ -141,10 +149,14 @@ class AddExpenses:
 	def setup_menu_options(self):
 
 		sheet = self.spreadsheet.sheet1;
-		# e.g. get A6:A17
-		range_of_cells_contents = sheet.get(COL_OPTIONS+str(EXPENSES_ROW_START)+':'+ COL_OPTIONS+str(EXPENSES_ROW_TOTALS - 1))
+		# e.g. get A6:A17		
+		group_a_range_of_cells_contents = sheet.get(COL_OPTIONS+str(GROUP_A_EXPENSES_ROW_START)+':'+ COL_OPTIONS+str(GROUP_A_EXPENSES_ROW_TOTALS - 1))
+		# TO DO: improve code avoiding hardcoding of expense grouping
+		#group_b_range_of_cells_contents = sheet.get(COL_OPTIONS+str(GROUP_B_EXPENSES_ROW_START)+':'+ COL_OPTIONS+str(GROUP_B_EXPENSES_ROW_TOTALS - 1))
+
 		# retrieve a single list of strings; ref. https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists/40857703
-		self.menu_options = self.flattenlist(range_of_cells_contents)
+		self.menu_options = self.flattenlist(group_a_range_of_cells_contents) \
+		#							+ self.flattenlist(group_b_range_of_cells_contents)
 
 	def flattenlist(self, list):
 		return functools.reduce(operator.iconcat, list, [])
@@ -174,18 +186,16 @@ class AddExpenses:
 			print("Selected option " + option + " not found")
 			return False
 
-	# validates if a proper currency number
+	# validates if a proper currency number or formula
 	def validate_value(self, value):
-		if not value.replace('.','',1).isdigit():
-			print("Provided value " + str(value) + " must be a number" + ("", ". Please use '.' for input of decimal values.")[value.replace(',','',1).isdigit()])
+
+		# define a pattern to match Google Sheets formula e.g. 1+2.3+3.45
+		pattern=re.compile(r'(\d+(\.\d+)*)(\+(\d+(\.\d+)*))*')
+
+		if (pattern.fullmatch(value) == None):
+			print('Invalid value ' + value + '. Acceptable values are either numeric with/out floating decimal point e.g. 1.23 or a formula similar to 1+2.3+4.56')
 			return False
-		elif float(value) <= 0:
-			print("Provided value " + str(value) + " must be positive")
-			return False
-		elif round(float(value), 2) == 0:
-			print("Provided value " + str(value) + " is too low.")
-			return False
-		
+
 		return True
 
 	# validates if a proper currency number
@@ -198,16 +208,12 @@ class AddExpenses:
 
 	# formats a string to a google spreadsheet number format e.g. '2.5' -> '2,50'
 	def format2gsnumber(self, string):
-		if string.replace('.','',1).isdigit():
+		# adding trailing zeros to string, https://www.kite.com/python/answers/how-to-print-a-float-with-two-decimal-places-in-python
+		# COMMENTED string = "{:.2f}".format(float(string))
 
-			# adding trailing zeros to string, https://www.kite.com/python/answers/how-to-print-a-float-with-two-decimal-places-in-python
-			string = "{:.2f}".format(float(string))
+		string = string.replace(".", ",")
 
-			string = string.replace(".", ",")
-
-			return string
-		else:
-			raise UnexpectedFormat(string + " is not a number")
+		return string
 
 	def append_value_to_expenses(self, option, value, month_col):
 
@@ -215,6 +221,8 @@ class AddExpenses:
 
 		# find the row corresponding to the menu_option
 		option_row = sheet.find(self.menu_options[int(option)], in_column=1).row
+
+		formatted_value = self.format2gsnumber(str(value))
 
 		if option_row is not None:
 			cell_position = month_col+str(option_row)
@@ -226,12 +234,11 @@ class AddExpenses:
 			try:
 				expense_value = sheet.get(cell_position)
 				# get the existing cell
-				expense_value_cell = sheet.acell(cell_position, value_render_option='FORMATTED_VALUE')
+				expense_value_cell = sheet.acell(cell_position, value_render_option='FORMULA') 	# see https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
 				# get the existing value's formula
-				expense_value_formula = str(expense_value_cell.value)  # uses FORMATTED_VALUE for the ',' commas
-				##delete expense_value_formula = flattenlist(expense_value_formula)
+				expense_value_formula = str(expense_value_cell.value)
 
-				print("Appending $" + self.format2gsnumber(str(value)) + 
+				print("Appending $" + formatted_value + 
 					  " to " + str_expense_item + 
 					  " under " + self.get_month_name_by_col(month_col) +
 					  ", current value: " + str(expense_value) + " " + str(expense_value_formula))
@@ -239,21 +246,20 @@ class AddExpenses:
 				# check for formula types
 				# e.g. '=1+2' 	-> '=1+2+3'
 				if expense_value_formula.find("=", 0, 1) > -1:		
-					expense_value_formula += "+" + self.format2gsnumber(str(value))
+					expense_value_formula += "+" + formatted_value
 				# e.g. '33' 	-> '=33+34'
 				elif(expense_value_formula.replace(',','',1).isdigit()):
-					expense_value_formula = "=" + expense_value_formula + "+" + self.format2gsnumber(str(value))
+					expense_value_formula = "=" + expense_value_formula + "+" + formatted_value
 				else:
 					raise UnexpectedFlow("Unable to determine proper formula update for cell " + cell_position + " in '" + str_expense_item + "' item")
 
 				# update the cell with the new formula
-				##deprecated sheet.update_acell(cell_position, expense_value_formula)
 				expense_value_cell.value = expense_value_formula
-				sheet.update_cells([expense_value_cell], value_input_option='USER_ENTERED')		## WARNING: this is not maintaining the full formula
+				sheet.update_cells([expense_value_cell], value_input_option='USER_ENTERED')
 
 				# report the final value
 				final_expense_value = sheet.get(cell_position)[0][0]
-				print("Final value set to: " + str(final_expense_value))
+				print("Final value set to: " + str(final_expense_value) + " " + expense_value_formula)
 
             # when there is no value found on the cell
 			except KeyError:
@@ -261,8 +267,8 @@ class AddExpenses:
 					  calendar.month_name[int(datetime.datetime.now().month)] + " " + 
 					  str(datetime.datetime.now().year) + ")")
 				print("Setting " + str_expense_item + 
-					  " with " + self.format2gsnumber(str(value)) + "...")
-				sheet.update_acell(cell_position, self.format2gsnumber(str(value)))
+					  " with " + formatted_value + "...")
+				sheet.update_acell(cell_position, "=" + formatted_value)
 		else:
 			raise UnexpectedFlow("Unexpected error: row for menu option " + option + " not found!")
 			
