@@ -112,7 +112,7 @@ Usage:
         add_expense [-h|--help]
         add_expense [-l|--list]
         add_expense [-a|--add] (<option> <value>) [<month>]
-        add_expense [-r|--read] <option>
+        add_expense [-r|--read] <option> [<month>]
 
 Options:
         -h --help  Show this screen
