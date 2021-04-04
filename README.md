@@ -94,6 +94,7 @@ Setting Electricity with $80.50...
 > Note: updates are always done to the current date's month unless month abbreviation e.g. Jan, Feb, etc. is specified.
 
 To read the current expenses from your spreadsheet type `add_expense.py -r 6` or `add_expense.py --read 6` (i.e. *Maintenance/repairs* for this example)
+> Note: updates are always done to the current date's month unless month abbreviation e.g. Jan, Feb, etc. is specified.
 
 ```
 Authenticating...
@@ -116,8 +117,8 @@ Usage:
 Options:
         -h --help  Show this screen
         -l --list  List options
-        -a --add   Add new expense (to current month, by default else use month 3-letter name e.g. Jan Feb Mar etc.)
-        -r --read  Reads current monthly expenses amount and formula
+        -a --add   Add new expense (to current month, by default, else use month 3-letter name e.g. Jan Feb Mar etc.)
+        -r --read  Reads expenses amount and formula (of current month, by default, else use month 3-letter name e.g. Jan Feb Mar etc.)
 ```
 
 <div style="text-align: right"> <a href="#add_expense">:point_up: go to top</a> </div>
